@@ -6,36 +6,43 @@ import os
 from .models import UspsServices, UserDetails
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-from xml.dom.minidom import parse,parseString,Document
+from xml.dom.minidom import parse, parseString, Document
 from pathlib import Path
 import json
 import requests
 
 # Logout Function
+
+
 def logout(request):
     # Redirect to the logout endpoint of Azure Web
     print("Logout Initiated")
-    return HttpResponseRedirect("/.auth/logout")    
+    return HttpResponseRedirect("/.auth/logout")
 
 # Main Init Function
-def init(request):    
-    # Populate User Details    
-    user_data = get_user_name (request)    
 
-    if not hasattr(user_data, "userName") or user_data.userName=="" :
+
+def init(request):
+    # Populate User Details
+    user_data = get_user_name(request)
+    # print(user_data)
+    if not hasattr(user_data, "userName") or user_data.userName == "":
         # If User Details not available, Return to Login Page
         print("Not Authenticated. Redirecting to Login Page")
         return HttpResponseRedirect(user_data.loginUrl)
     else:
-        #If User Details are available, Populate InstanceName variable
+        # If User Details are available, Populate InstanceName variable
         user_data.instanceName = str(settings.ENVIRONMENT).upper()
 
-        # If User Details are available, read XML Services File and generate Links            
-        xmldoc = ET.parse(os.path.join(os.path.dirname(__file__),'services.xml'))
+        # If User Details are available, read XML Services File and generate Links
+        xmldoc = ET.parse(os.path.join(
+            os.path.dirname(__file__), 'services.xml'))
         root = xmldoc.getroot()
-        
         serviceList = []
-        
+        supplieraccess_list = []
+        for item in user_data.ileAccessList:
+            if "FA" == item.split("|")[0].upper():
+                supplieraccess_list.append(item.split("|")[-3])
         for child in root:
             service = UspsServices()        
             service.serviceCode = child.attrib['serviceCode'].upper()
@@ -48,31 +55,40 @@ def init(request):
             # If ServiceCode (from xml) is available in User's ILE Access List, show the service
             try:
                 
-                for item in user_data.ileAccessList:                         
-                    if service.serviceCode == item.split("|")[0].upper():
+                for item in user_data.ileAccessList:
+
+                    if "FA" == item.split("|")[0].upper(): 
                         service.accessFlag = True  
-                        break          
+                        break    
+                    elif "ILERPT" == item.split("|")[0].upper(): 
+                        service.accessFlag = True  
+                        break    
                     else :
                         service.accessFlag = False
             except Exception as e:
                 print(e)
                 service.accessFlag = False
             service.pendingActivationFlag = int(os.environ.get('BPG_LINKS_DISABLED',0)) if 'BPG_LINKS_DISABLED' in os.environ else 0
+            
             if service.pendingActivationFlag == 0:
                 try:
                     for item in user_data.ileAccessList:
-                        if service.serviceCode + "|" + "TRUE"==item:
+                        if service.serviceCode + "|" + "TRUE"==item.split("|")[0] + "|" + item.split("|")[-1]:
+                            print('0')
                             service.pendingActivationFlag = 0
                             break
                         else:
+                            print('1')
                             service.pendingActivationFlag = 1
                 except Exception as e:
-                    #Do nothing since pending flag is already initialized from Environment
+                    print(e)
+                    # Do nothing since pending flag is already initialized from Environment
                     pass            
             service.id = child.attrib['id']                
             serviceList.append(service)
         serviceList.append(user_data)    
-    return render(request, 'bpgtemplate.html',{"serviceList":serviceList})
+        print(supplieraccess_list)
+    return render(request, 'bpgtemplate.html',{"SupplieracessList":supplieraccess_list,"serviceList":serviceList})
         
 
 # Get User Details        
@@ -80,9 +96,9 @@ def get_user_name(request):
     # For Testing in Local Only. Will be removed before deployment to Prod
     user_details = UserDetails()
     user_details.userName = "Test"
-    user_details.ileAccessList = ['FA|TRUE','ILERPT|FALSE']
+    # user_details.ileAccessList = ['FA|TRUE','ILERPT|FALSE']
+    user_details.ileAccessList = ['FA|3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c|aaaa|AAA Trucking|DEV|TRUE','FA|4d4d4d4d-4d4d-4d4d-4d4d-4d4d4d4d4d4d|bbbb|BBB Trucking|DEV|TRUE','ILERPT|FALSE']
     user_details.loginUrl="aaa"
-    print(user_details)
     return(user_details)
     
     try:
@@ -102,7 +118,7 @@ def get_user_name(request):
         # Generate a list of user-claims user has access to
         user_details.ileAccessList=get_access_list (auth_response['user_claims'])
 
-        #Generate Login URL
+        # Generate Login URL
         user_details.loginUrl = get_login_url (auth_response['user_claims'])
         return (user_details)
         
@@ -116,7 +132,7 @@ def get_user_name(request):
 def get_access_token(request):
 
     auth_url = request.scheme + "://" + os.environ.get('WEBSITE_HOSTNAME') +"/.auth/me"
-    #print("AUTH URL"+auth_url)
+    # print("AUTH URL"+auth_url)
     try:        
         cookie = request.COOKIES.get("AppServiceAuthSession")
         if cookie is not None:

@@ -54,16 +54,16 @@
 			border: none;
 			cursor: pointer;
 		  }
-		  
+
 		  .dropbtn:hover, .dropbtn:focus {
 			background-color: #2980B9;
 		  }
-		  
+
 		  .dropdown {
 			position: relative;
 			display: inline-block;
 		  }
-		  
+
 		  .dropdown-content {
 			display: none;
 			position: absolute;
@@ -73,7 +73,7 @@
 			box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 			z-index: 1;
 		  }
-		  
+
 		  .dropdown-content a {
 			text-align: center;
 			color: #333366;
@@ -82,11 +82,11 @@
 			display: block;
 			font-weight: 600;
 		  }
-		  
+
 		  .dropdown a:hover {background-color: #ddd;text-decoration: none;}
-		  
+
 		  .show {display: block;}
-	</style>	
+	</style>
 </head>
 
 <body class="claro" id="pageBodyId">
@@ -257,8 +257,10 @@
 													<div class="dropdown">
 														<button onclick="myFunction()" alt="Go to {{lst.serviceName}} service button" class="dropbtn btn btn-sm btn-primary service-button">Go to Service</button>
 														<div id="myDropdown" class="dropdown-content">
-														  <a href="{{lst.url}}" tabindex="39">AAA </a>
-														  <a href="{{lst.url}}" tabindex="39">BBB </a>
+															{% for author in SupplieracessList %}
+																<a href="{{lst.url}}" tabindex="39">{{ author|safe }}</a>
+															{% endfor %}
+														  {% comment %} <a href="{{lst.url}}" tabindex="39">BBB </a> {% endcomment %}
 														</div>
 													</div>
 													<!-- Pushing Logout URL into Array-->
@@ -379,12 +381,12 @@
 	</div>
 
 	<script>
-		/* When the user clicks on the button, 
+		/* When the user clicks on the button,
 		toggle between hiding and showing the dropdown content */
 		function myFunction() {
 		  document.getElementById("myDropdown").classList.toggle("show");
 		}
-		
+
 		// Close the dropdown if the user clicks outside of it
 		window.onclick = function(event) {
 		  if (!event.target.matches('.dropbtn')) {
