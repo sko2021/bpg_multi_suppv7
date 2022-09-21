@@ -41,8 +41,12 @@ def init(request):
         serviceList = []
         supplieraccess_list = []
         for item in user_data.ileAccessList:
+            f = {}
             if "FA" == item.split("|")[0].upper():
-                supplieraccess_list.append(item.split("|")[-3])
+                f['acc']=item.split("|")[-3]
+                f['uid'] = item.split("|")[1]     
+                d = f
+                supplieraccess_list.append(d)    
         for child in root:
             service = UspsServices()        
             service.serviceCode = child.attrib['serviceCode'].upper()
@@ -74,11 +78,9 @@ def init(request):
                 try:
                     for item in user_data.ileAccessList:
                         if service.serviceCode + "|" + "TRUE"==item.split("|")[0] + "|" + item.split("|")[-1]:
-                            print('0')
                             service.pendingActivationFlag = 0
                             break
                         else:
-                            print('1')
                             service.pendingActivationFlag = 1
                 except Exception as e:
                     print(e)
