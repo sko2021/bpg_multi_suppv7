@@ -96,12 +96,12 @@ def init(request):
 # Get User Details        
 def get_user_name(request):
     # For Testing in Local Only. Will be removed before deployment to Prod
-    user_details = UserDetails()
-    user_details.userName = "Test"
-    # user_details.ileAccessList = ['FA|TRUE','ILERPT|FALSE']
-    user_details.ileAccessList = ['FA|3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c|aaaa|AAA Trucking|DEV|TRUE','FA|4d4d4d4d-4d4d-4d4d-4d4d-4d4d4d4d4d4d|bbbb|BBB Trucking|DEV|TRUE','ILERPT|FALSE']
-    user_details.loginUrl="aaa"
-    return(user_details)
+    # user_details = UserDetails()
+    # user_details.userName = "Test"
+    # # user_details.ileAccessList = ['FA|TRUE','ILERPT|FALSE']
+    # user_details.ileAccessList = ['FA|3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c|aaaa|AAA Trucking|DEV|TRUE','FA|4d4d4d4d-4d4d-4d4d-4d4d-4d4d4d4d4d4d|bbbb|BBB Trucking|DEV|TRUE','ILERPT|FALSE']
+    # user_details.loginUrl="aaa"
+    # return(user_details)
     
     try:
         user_details = UserDetails()
