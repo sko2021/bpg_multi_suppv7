@@ -122,6 +122,8 @@ def get_user_name(request):
 
         # Generate Login URL
         user_details.loginUrl = get_login_url (auth_response['user_claims'])
+        print("user_details",user_details)
+        print("user_ileAccessList",user_details.ileAccessList)
         return (user_details)
         
     except Exception as e:
