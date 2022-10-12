@@ -129,7 +129,7 @@ def get_user_name(request):
         user_details.loginUrl = get_login_url (auth_response['user_claims'])
         print("user_details",user_details)
         print("user_ileAccessList",user_details.ileAccessList)
-        return user_details,access_token
+        return (user_details,access_token)
         
     except Exception as e:
         print ("get_user_name Exception")
