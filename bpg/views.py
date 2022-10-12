@@ -25,7 +25,7 @@ def logout(request):
 
 def init(request):
     # Populate User Details
-    user_data = get_user_name(request)
+    user_data,access_token = get_user_name(request)
     # print(user_data)
     if not hasattr(user_data, "userName") or user_data.userName == "":
         # If User Details not available, Return to Login Page
@@ -94,7 +94,7 @@ def init(request):
             serviceList.append(service)
         serviceList.append(user_data)    
         print(supplieraccess_list)
-    return render(request, 'bpgtemplate.html',{"SupplieracessList":supplieraccess_list,"serviceList":serviceList})
+    return render(request, 'bpgtemplate.html',{"access_token":access_token,"SupplieracessList":supplieraccess_list,"serviceList":serviceList})
         
 
 # Get User Details        
@@ -105,7 +105,8 @@ def get_user_name(request):
     # user_details.ileAccessList = ['FA|TRUE','ILERPT|FALSE']
     # # user_details.ileAccessList = ['FA|3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c|aaaa|AAA Trucking|DEV|TRUE','FA|4d4d4d4d-4d4d-4d4d-4d4d-4d4d4d4d4d4d|bbbb|BBB Trucking|DEV|TRUE','ILERPT|FALSE']
     # user_details.loginUrl="aaa"
-    # return(user_details)
+    # access_token="Dsdds"
+    # return(user_details,access_token)
     
     try:
         user_details = UserDetails()
@@ -134,7 +135,7 @@ def get_user_name(request):
         print ("get_user_name Exception")
         print (e)
         user_details.userName=""
-        return (user_details)   
+        return (user_details,access_token)
 
 # Fetch Access Token for the validated user
 def get_access_token(request):
@@ -200,16 +201,13 @@ def get_login_url(user_claims):
         print (e)       
     return(login_url)
 
-def update_user_details(user_id,given_name,surname,company_name,access_token):
-    print('update_user_details user_id'+user_id)
-    url = 'https://graph.microsoft.com/v1.0/users/'+user_id
+def update_user_details(access_token,user_id):
+    print('update_user_details user_id'+user_id+access_token)
+    url = 'https://graph.microsoft.com/v1.0/users/ILEUser4@hotmail.com'
     
     req_body = {
-        "givenName":given_name,
-        "surname":surname,
-        "companyName":company_name
+        "FA_Session_UserID":user_id,
     }
-    
     req_header = {'Content-Type':'application/json',
                   'Authorization':'Bearer' + access_token}
     response = requests.patch(url, json=req_body,headers=req_header)
@@ -217,3 +215,4 @@ def update_user_details(user_id,given_name,surname,company_name,access_token):
     print(response)
     
     print('User Update Result')
+    return HttpResponse(response, content_type='text/plain')
