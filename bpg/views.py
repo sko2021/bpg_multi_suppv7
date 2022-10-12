@@ -120,10 +120,12 @@ def get_user_name(request):
         # Generate UserName to be shown in page
         if "givenName" in graph_response:
             user_details.userName=graph_response["givenName"]
+            user_details.userId=graph_response["id"]
             if "mail" in graph_response:
                 user_details.userName = user_details.userName + " (" + graph_response["mail"] + ")"
         # Generate a list of user-claims user has access to
-        user_details.ileAccessList=get_access_list (auth_response['user_claims'])
+        user_details.ileAccessList = ['FA|UC00000011|000406395|MAXWAY|DEV|TRUE','FA|UC10000011|001105117|10 ROADS|DEV|TRUE','ILERPT|FALSE']
+        #user_details.ileAccessList=get_access_list (auth_response['user_claims'])
 
         # Generate Login URL
         user_details.loginUrl = get_login_url (auth_response['user_claims'])
@@ -201,9 +203,9 @@ def get_login_url(user_claims):
         print (e)       
     return(login_url)
 
-def update_user_details(access_token,user_id):
+def update_user_details(access_token,user_id,parent_id):
     print('update_user_details user_id'+user_id+access_token)
-    url = 'https://graph.microsoft.com/v1.0/users/ILEUser4@hotmail.com'
+    url = 'https://graph.microsoft.com/v1.0/users/'+parent_id
     
     req_body = {
         "FA_Session_UserID":user_id,
