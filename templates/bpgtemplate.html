@@ -3,6 +3,10 @@
 <html>
 
 <head>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet">
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
 	<script>
 		/*
 		* show and hide descriptions for services
@@ -86,10 +90,21 @@
 		  .dropdown a:hover {background-color: #ddd;text-decoration: none;}
 
 		  .show {display: block;}
+
+		  .dropdown:hover > .dropdown-menu {
+			display: block;
+		  }
+		  
+		  .dropdown > .dropdown-toggle:active {
+			/*Without this, clicking will make it sticky*/
+			pointer-events: none;
+		  }
+		  
 	</style>
 </head>
 
 <body class="claro" id="pageBodyId">
+	
 	<!-- begin #page -->
 	<div id="page">
 		<div class="bootstrap-iso pt-0 mt-0 mb-0 pb-0">
@@ -179,6 +194,13 @@
 									alt="image of parked postal trucks">
 							</div>
 						</div>
+						{% if messages %}
+						{% for message in messages %}
+						<small style='color:red;' {% if messages.tags %} class="{{messages.tags}}" {% endif %}>
+							<b>{{message}}</b>
+						</small>
+						{% endfor %}
+						{% endif %}
 						<!-- Check if you are not in Production-->
 						{% for lst in serviceList %}
 						{% if lst.userName and lst.instanceName != "PROD" %}
@@ -255,13 +277,27 @@
 														</button>
 													</a> {% endcomment %}
 													<div class="dropdown">
-														<button onclick="myFunction()" alt="Go to {{lst.serviceName}} service button" class="dropbtn btn btn-sm btn-primary service-button">Go to Service</button>
+														{% comment %} <button onclick="myFunction()" alt="Go to {{lst.serviceName}} service button" class="dropbtn btn btn-sm btn-primary service-button">Go to Service</button>
 														<div id="myDropdown" class="dropdown-content">
+															<a href="https://graph.microsoft.com/v1.0/users/UC10000011" tabindex="39">MAXWAY</a>
+														  	<a  href="https://graph.microsoft.com/v1.0/users/UC00000011" tabindex="39">10 ROADS </a>
+														</div> {% endcomment %}
+														<div class="dropdown">
+															<button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+																Go to Service
+															</button>
+															<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+															  <a class="dropdown-item" href="https://graph.microsoft.com/v1.0/users/000406395">MAXWAY</a>
+															  <a class="dropdown-item" href="https://graph.microsoft.com/v1.0/users/001105117">10 ROADS</a>
+															</div>
+														</div>
+														  
+														{% comment %} <div id="myDropdown" class="dropdown-content">
 															{% for supp in SupplieracessList %}
 																<a href="https://graph.microsoft.com/v1.0/users/{{supp.uid}}" tabindex="39">{{ supp.acc|safe }}</a>
 															{% endfor %}
-														  {% comment %} <a href="{{lst.url}}" tabindex="39">BBB </a> {% endcomment %}
-														</div>
+														  	<a href="{{lst.url}}" tabindex="39">BBB </a>
+														</div> {% endcomment %}
 													</div>
 													<!-- Pushing Logout URL into Array-->
 													<script>logoutUrls.push("{{lst.logoutUrl}}")</script>

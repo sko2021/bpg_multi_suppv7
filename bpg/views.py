@@ -10,6 +10,7 @@ from xml.dom.minidom import parse, parseString, Document
 from pathlib import Path
 import json
 import requests
+from django.contrib import messages
 
 # Logout Function
 
@@ -39,14 +40,17 @@ def init(request):
             os.path.dirname(__file__), 'services.xml'))
         root = xmldoc.getroot()
         serviceList = []
-        supplieraccess_list = []
-        for item in user_data.ileAccessList:
-            f = {}
-            if "FA" == item.split("|")[0].upper():
-                f['acc']=item.split("|")[-3]
-                f['uid'] = item.split("|")[1]     
-                d = f
-                supplieraccess_list.append(d)    
+        try:
+            supplieraccess_list = []
+            for item in user_data.ileAccessList:
+                f = {}
+                if "FA" == item.split("|")[0].upper():
+                    f['acc']=item.split("|")[-3]
+                    f['uid'] = item.split("|")[1]     
+                    d = f
+                    supplieraccess_list.append(d)
+        except:
+            messages.success(request,'You are not authorized to use the services of Business Process Gateway. Please contact your manager for assistance.')                
         for child in root:
             service = UspsServices()        
             service.serviceCode = child.attrib['serviceCode'].upper()
@@ -98,8 +102,8 @@ def get_user_name(request):
     # For Testing in Local Only. Will be removed before deployment to Prod
     # user_details = UserDetails()
     # user_details.userName = "Test"
-    # # user_details.ileAccessList = ['FA|TRUE','ILERPT|FALSE']
-    # user_details.ileAccessList = ['FA|3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c|aaaa|AAA Trucking|DEV|TRUE','FA|4d4d4d4d-4d4d-4d4d-4d4d-4d4d4d4d4d4d|bbbb|BBB Trucking|DEV|TRUE','ILERPT|FALSE']
+    # user_details.ileAccessList = ['FA|TRUE','ILERPT|FALSE']
+    # # user_details.ileAccessList = ['FA|3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c|aaaa|AAA Trucking|DEV|TRUE','FA|4d4d4d4d-4d4d-4d4d-4d4d-4d4d4d4d4d4d|bbbb|BBB Trucking|DEV|TRUE','ILERPT|FALSE']
     # user_details.loginUrl="aaa"
     # return(user_details)
     
@@ -195,3 +199,21 @@ def get_login_url(user_claims):
         print ("get_login_url Exception")
         print (e)       
     return(login_url)
+
+def update_user_details(user_id,given_name,surname,company_name,access_token):
+    print('update_user_details user_id'+user_id)
+    url = 'https://graph.microsoft.com/v1.0/users/'+user_id
+    
+    req_body = {
+        "givenName":given_name,
+        "surname":surname,
+        "companyName":company_name
+    }
+    
+    req_header = {'Content-Type':'application/json',
+                  'Authorization':'Bearer' + access_token}
+    response = requests.patch(url, json=req_body,headers=req_header)
+    print('send data')
+    print(response)
+    
+    print('User Update Result')
