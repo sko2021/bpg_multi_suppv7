@@ -203,9 +203,9 @@ def get_login_url(user_claims):
         print (e)       
     return(login_url)
 
-def update_user_details(access_token,user_id,parent_id):
+def update_user_details(access_token,user_id):
     print('update_user_details user_id'+user_id+access_token)
-    url = 'https://graph.microsoft.com/v1.0/users/'+parent_id
+    url = 'https://graph.microsoft.com/v1.0/users/'+user_id
     
     req_body = {
         "FA_Session_UserID":user_id,
