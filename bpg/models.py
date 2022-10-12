@@ -15,6 +15,7 @@ class UspsServices:
 class UserDetails:
     uid : int
     userName : str
+    userId : str    
     ileAccessList = []
     loginUrl : str
     instanceName: str 
